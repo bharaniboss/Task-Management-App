@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskMaster Pro</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.transit/0.9.12/jquery.transit.min.js"></script>
+</head>
+<body>
+    <!-- Auth Container (Login/Register) -->
+    <div id="auth-container" class="auth-container">
+        <div class="auth-logo">
+            <i class="fas fa-tasks"></i>
+            <h1>TaskMaster Pro</h1>
+        </div>
+        
+        <div class="auth-tabs">
+            <button class="auth-tab active" data-tab="login">Sign In</button>
+            <button class="auth-tab" data-tab="register">Sign Up</button>
+        </div>
+        
+        <!-- Login Form -->
+        <div id="login-form" class="auth-form active">
+            <div class="form-group">
+                <label for="login-email">Email</label>
+                <div class="input-icon">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="login-email" placeholder="Enter your email">
+                </div>
+                <span class="error-message" id="login-email-error"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="login-password">Password</label>
+                <div class="input-icon">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="login-password" placeholder="Enter your password">
+                    <i class="fas fa-eye toggle-password"></i>
+                </div>
+                <span class="error-message" id="login-password-error"></span>
+            </div>
+            
+            <div class="form-group remember-me">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="remember-me">
+                    <span class="checkmark"></span>
+                    Remember me
+                </label>
+                <a href="#" class="forgot-password">Forgot Password?</a>
+            </div>
+            
+            <button id="login-btn" class="auth-button">Sign In</button>
+        </div>
+        
+        <!-- Register Form -->
+        <div id="register-form" class="auth-form">
+            <div class="form-group">
+                <label for="register-name">Full Name</label>
+                <div class="input-icon">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="register-name" placeholder="Enter your full name">
+                </div>
+                <span class="error-message" id="register-name-error"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="register-email">Email</label>
+                <div class="input-icon">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="register-email" placeholder="Enter your email">
+                </div>
+                <span class="error-message" id="register-email-error"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="register-password">Password</label>
+                <div class="input-icon">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="register-password" placeholder="Create a password">
+                    <i class="fas fa-eye toggle-password"></i>
+                </div>
+                <span class="error-message" id="register-password-error"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="register-confirm-password">Confirm Password</label>
+                <div class="input-icon">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="register-confirm-password" placeholder="Confirm your password">
+                </div>
+                <span class="error-message" id="register-confirm-password-error"></span>
+            </div>
+            
+            <div class="form-group terms">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="terms-checkbox">
+                    <span class="checkmark"></span>
+                    I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                </label>
+                <span class="error-message" id="terms-error"></span>
+            </div>
+            
+            <button id="register-btn" class="auth-button">Create Account</button>
+        </div>
+    </div>
+    
+    <!-- Main App Container (Hidden until login) -->
+    <div id="app-container" class="app-container hidden">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-tasks"></i>
+                    <span>TaskMaster</span>
+                </div>
+                <button id="sidebar-toggle" class="sidebar-toggle">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            
+            <div class="sidebar-user">
+                <div class="user-avatar">
+                    <span id="user-initials">JD</span>
+                </div>
+                <div class="user-info">
+                    <span id="user-name">John Doe</span>
+                    <span id="user-email">john@example.com</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active" data-page="dashboard">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </li>
+                    <li data-page="tasks">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Tasks</span>
+                    </li>
+                    <li data-page="calendar">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Calendar</span>
+                    </li>
+                    <li data-page="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <header class="top-header">
+                <div class="header-left">
+                    <button id="menu-toggle" class="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="search-bar">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search tasks...">
+                    </div>
+                </div>
+                
+                <div class="header-right">
+                    <button id="theme-toggle" class="theme-toggle">
+                        <i class="fas fa-moon"></i>
+                        <i class="fas fa-sun"></i>
+                    </button>
+                    <div class="notifications">
+                        <button class="notification-btn">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge">3</span>
+                        </button>
+                        <div class="notification-dropdown">
+                            <div class="notification-header">
+                                <h3>Notifications</h3>
+                                <button class="mark-all-read">Mark all as read</button>
+                            </div>
+                            <div class="notification-list">
+                                <div class="notification-item unread">
+                                    <div class="notification-icon">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <p>Task "Project Proposal" is overdue!</p>
+                                        <span class="notification-time">2 hours ago</span>
+                                    </div>
+                                </div>
+                                <div class="notification-item unread">
+                                    <div class="notification-icon">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <p>Task "Client Meeting" is due in 30 minutes</p>
+                                        <span class="notification-time">30 minutes ago</span>
+                                    </div>
+                                </div>
+                                <div class="notification-item unread">
+                                    <div class="notification-icon">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <p>You completed 5 tasks today!</p>
+                                        <span class="notification-time">1 hour ago</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="notification-footer">
+                                <a href="#">View all notifications</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="user-menu">
+                        <button class="user-menu-btn">
+                            <div class="user-avatar small">
+                                <span id="header-user-initials">JD</span>
+                            </div>
+                            <span id="header-user-name">John Doe</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="user-dropdown">
+                            <ul>
+                                <li>
+                                    <i class="fas fa-user"></i>
+                                    <span>My Profile</span>
+                                </li>
+                                <li>
+                                    <i class="fas fa-cog"></i>
+                                    <span>Account Settings</span>
+                                </li>
+                                <li class="dropdown-divider"></li>
+                                <li id="user-logout">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span>Logout</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Dashboard Page -->
+            <div id="dashboard-page" class="page active">
+                <div class="page-header">
+                    <h1>Dashboard</h1>
+                    <p class="current-date" id="current-date">Monday, January 1, 2023</p>
+                </div>
+                
+                <div class="dashboard-summary">
+                    <div class="summary-card">
+                        <div class="summary-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <div class="summary-info">
+                            <h3>Total Tasks</h3>
+                            <p id="total-tasks-count">0</p>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <div class="summary-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="summary-info">
+                            <h3>Completed</h3>
+                            <p id="completed-tasks-count">0</p>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <div class="summary-icon">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
+                        <div class="summary-info">
+                            <h3>Pending</h3>
+                            <p id="pending-tasks-count">0</p>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <div class="summary-icon">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="summary-info">
+                            <h3>Overdue</h3>
+                            <p id="overdue-tasks-count">0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-charts">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3>Task Completion</h3>
+                            <div class="chart-period">
+                                <button class="period-btn active" data-period="week">Week</button>
+                                <button class="period-btn" data-period="month">Month</button>
+                                <button class="period-btn" data-period="year">Year</button>
+                            </div>
+                        </div>
+                        <div class="chart-body">
+                            <canvas id="completion-chart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3>Task Distribution</h3>
+                        </div>
+                        <div class="chart-body">
+                            <canvas id="distribution-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-recent">
+                    <div class="recent-header">
+                        <h3>Recent Tasks</h3>
+                        <a href="#" class="view-all" data-page="tasks">View All</a>
+                    </div>
+                    <div class="recent-tasks" id="recent-tasks">
+                        <!-- Recent tasks will be populated here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tasks Page -->
+            <div id="tasks-page" class="page">
+                <div class="page-header">
+                    <h1>Tasks</h1>
+                    <button id="add-task-btn" class="primary-btn">
+                        <i class="fas fa-plus"></i>
+                        Add Task
+                    </button>
+                </div>
+                
+                <div class="task-filters">
+                    <div class="filter-group">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="pending">Pending</button>
+                        <button class="filter-btn" data-filter="completed">Completed</button>
+                        <button class="filter-btn" data-filter="overdue">Overdue</button>
+                    </div>
+                    
+                    <div class="sort-group">
+                        <label for="sort-select">Sort by:</label>
+                        <select id="sort-select">
+                            <option value="date-desc">Date (Newest)</option>
+                            <option value="date-asc">Date (Oldest)</option>
+                            <option value="due-date">Due Date</option>
+                            <option value="name-asc">Name (A-Z)</option>
+                            <option value="name-desc">Name (Z-A)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-text">
+                        <span id="progress-percentage">0%</span> Completed
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+                
+                <div class="task-list" id="task-list">
+                    <!-- Tasks will be populated here -->
+                </div>
+            </div>
+            
+            <!-- Calendar Page -->
+            <div id="calendar-page" class="page">
+                <div class="page-header">
+                    <h1>Calendar</h1>
+                </div>
+                
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <button id="prev-month" class="calendar-nav-btn">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <h2 id="calendar-month-year">January 2023</h2>
+                        <button id="next-month" class="calendar-nav-btn">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="calendar-weekdays">
+                        <div>Sun</div>
+                        <div>Mon</div>
+                        <div>Tue</div>
+                        <div>Wed</div>
+                        <div>Thu</div>
+                        <div>Fri</div>
+                        <div>Sat</div>
+                    </div>
+                    
+                    <div class="calendar-days" id="calendar-days">
+                        <!-- Calendar days will be populated here -->
+                    </div>
+                </div>
+                
+                <div class="calendar-events">
+                    <h3 id="selected-date">Today's Tasks</h3>
+                    <div class="event-list" id="event-list">
+                        <!-- Events will be populated here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Settings Page -->
+            <div id="settings-page" class="page">
+                <div class="page-header">
+                    <h1>Settings</h1>
+                </div>
+                
+                <div class="settings-container">
+                    <div class="settings-section">
+                        <h3>Account Settings</h3>
+                        <div class="settings-form">
+                            <div class="form-group">
+                                <label for="settings-name">Full Name</label>
+                                <input type="text" id="settings-name" value="John Doe">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="settings-email">Email</label>
+                                <input type="email" id="settings-email" value="john@example.com">
+                            </div>
+                            
+                            <button id="update-account" class="primary-btn">Save Changes</button>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-section">
+                        <h3>Password</h3>
+                        <div class="settings-form">
+                            <div class="form-group">
+                                <label for="current-password">Current Password</label>
+                                <input type="password" id="current-password">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="new-password">New Password</label>
+                                <input type="password" id="new-password">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="confirm-new-password">Confirm New Password</label>
+                                <input type="password" id="confirm-new-password">
+                            </div>
+                            
+                            <button id="update-password" class="primary-btn">Update Password</button>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-section">
+                        <h3>Preferences</h3>
+                        <div class="settings-form">
+                            <div class="form-group toggle-group">
+                                <label for="notification-toggle">Enable Notifications</label>
+                                <label class="toggle">
+                                    <input type="checkbox" id="notification-toggle" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="form-group toggle-group">
+                                <label for="sound-toggle">Enable Sound Alerts</label>
+                                <label class="toggle">
+                                    <input type="checkbox" id="sound-toggle" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="form-group toggle-group">
+                                <label for="dark-mode-toggle">Dark Mode</label>
+                                <label class="toggle">
+                                    <input type="checkbox" id="dark-mode-toggle">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <button id="save-preferences" class="primary-btn">Save Preferences</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add/Edit Task Modal -->
+    <div id="task-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Add New Task</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="task-title">Task Title</label>
+                    <input type="text" id="task-title" placeholder="Enter task title">
+                </div>
+                
+                <div class="form-group">
+                    <label for="task-description">Description (Optional)</label>
+                    <textarea id="task-description" placeholder="Enter task description"></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="task-due-date">Due Date</label>
+                        <input type="date" id="task-due-date">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="task-due-time">Due Time</label>
+                        <input type="time" id="task-due-time">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="task-priority">Priority</label>
+                    <select id="task-priority">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button id="cancel-task" class="secondary-btn">Cancel</button>
+                <button id="save-task" class="primary-btn">Save Task</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification Sound -->
+    <audio id="notification-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-software-interface-alert-2573.mp3" preload="auto"></audio>
+    
+    <script src="script.js"></script>
+</body>
+</html>
